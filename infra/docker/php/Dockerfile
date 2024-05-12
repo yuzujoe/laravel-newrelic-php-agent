@@ -45,6 +45,12 @@ RUN <<EOF
   rm -rf /var/lib/apt/lists/*
 EOF
 
+# New Relic Agent インストール
+ARG NEW_RELIC_AGENT_VERSION
+RUN curl -L https://download.newrelic.com/php_agent/archive/${NEW_RELIC_AGENT_VERSION}/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux.tar.gz | tar -C /tmp -zx \
+    && NR_INSTALL_USE_CP_NOT_LN=1 NR_INSTALL_SILENT=1 /tmp/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux/newrelic-install install \
+    && rm -rf /tmp/newrelic-php5-* /tmp/nrinstall*
+
 FROM base AS development
 
 COPY ./infra/docker/php/php.development.ini /usr/local/etc/php/php.ini
@@ -65,9 +71,8 @@ USER phper
 FROM base AS deploy
 
 COPY ./infra/docker/php/php.deploy.ini /usr/local/etc/php/php.ini
+COPY ./infra/docker/php/newrelic.ini $PHP_INI_DIR/conf.d/newrelic.ini
 COPY --chown=phper:phper ./src /workspace
-
-USER phper
 
 RUN <<EOF
   composer install --quiet --no-interaction --no-ansi --no-dev --no-scripts --no-progress --prefer-dist

@@ -6,14 +6,18 @@ services:
     build:
       context: .
       dockerfile: ./infra/docker/php/Dockerfile
+      platforms:
+        - linux/x86_64
       args:
         UID: ${UID:-1000}
         GID: ${GID:-1000}
+        NEW_RELIC_AGENT_VERSION: 10.20.0.10
       target: ${APP_BUILD_TARGET:-development}
     volumes:
       - type: bind
         source: ./src
         target: /workspace
+        consistency: cached
     environment:
       # Please remove this environment variable, after created the Laravel project. Please write in .env
       - DB_CONNECTION=${DB_CONNECTION:-mysql}
@@ -22,10 +26,15 @@ services:
       - DB_DATABASE=${DB_DATABASE:-laravel}
       - DB_USERNAME=${DB_USERNAME:-phper}
       - DB_PASSWORD=${DB_PASSWORD:-secret}
-
+      - NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY:-}
+      - APP_KEY=${APP_KEY:-}
+      - APP_URL=http://localhost
+      - APP_ENV=local
   web:
     build:
       context: .
+      platforms:
+        - linux/x86_64
       dockerfile: ./infra/docker/nginx/Dockerfile
     ports:
       - target: 80
@@ -36,10 +45,13 @@ services:
       - type: bind
         source: ./src
         target: /workspace
+        consistency: cached
 
   db:
     build:
       context: .
+      platforms:
+        - linux/x86_64
       dockerfile: ./infra/docker/mysql/Dockerfile
     ports:
       - target: 3306
@@ -60,8 +72,13 @@ services:
 
   mailpit:
     image: axllent/mailpit
+    platform: linux/x86_64
     ports:
       - target: 8025
         published: ${MAILPIT_PUBLISHED_PORT:-8025}
         protocol: tcp
         mode: host
+
+  newrelic-php-daemon:
+    image:  newrelic/php-daemon:10.20.0
+    platform: linux/x86_64

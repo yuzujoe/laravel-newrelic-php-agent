@@ -1,0 +1,4 @@
+export NEW_RELIC_LICENSE_KEY=your_license_key
+
+export APP_KEY=<php php artisan key:generate --show の結果を貼り付ける>
+export APP_BUILD_TARGET=deploy
