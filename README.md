@@ -3,7 +3,7 @@ Laravel の Docker 環境で [New Relic PHP Agent](https://docs.newrelic.com/doc
 
 ## 環境構築
 
-direnv で環境変数を読み込むため、`.envrc` ファイルを作成します。
+### 1. direnv で環境変数を読み込むため、`.envrc` ファイルを作成します。
 
 ```shell
 cp .envrc.sample .envrc
@@ -13,9 +13,7 @@ cp .envrc.sample .envrc
 
 New Relic API Key は [New Relic のダッシュボード](https://docs.newrelic.com/docs/apis/intro-apis/new-relic-api-keys/) から取得してください。
 
-```shell
-
-docker compose で環境を構築します。
+### 2. docker compose で環境を構築します。
 
 ```shell
 docker compose build
